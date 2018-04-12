@@ -2,16 +2,31 @@
 import datetime
 
 
-def get_horarios():
+def get_choices_horarios():
     """
-    Retorna os horários de um dia para cadastro de funcionamento do restaurante.
+    Retorna choices de horários.
     """
-    now = datetime.datetime(2013, 2, 9, 8, 00)
-    end=now+datetime.timedelta(hours=9)
+    horarios = []
+    horario_atual = datetime.datetime(2018, 1, 1, 8)
 
-    l=[]
-    while now<=end:
-        l.append(now)
-        now+=datetime.timedelta(minutes=15)
+    while horario_atual.hour < 23:
+        horario = horario_atual.strftime("%H:%M")
+        horarios.append((horario, horario))
+        horario_atual += datetime.timedelta(minutes=15)
+    return horarios
 
-    print [t.strftime("%H:%M") for t in l]
+
+def get_choices_dias_semana():
+    """
+    Retorna choices de dias da semana.
+    O valores armazenados se baseam no retorno da função datetime.date.weekday.
+    """
+    return [
+        (0, 'Segunda-Feira'),
+        (1, 'Terça-Feira'),
+        (2, 'Quarta-Feira'),
+        (3, 'Quinta-Feira'),
+        (4, 'Sexta-Feira'),
+        (5, 'Sábado'),
+        (6, 'Domingo')
+    ]
