@@ -1,4 +1,5 @@
 #-*- coding: UTF-8 -*-
+from django_google_maps import fields as map_fields
 from django.conf import settings
 from django.db import models
 from estabelecimento import utils
@@ -8,14 +9,11 @@ class TipoEstabelecimento(models.Model):
     """
     Representação de categorias.
     """
-    slug = models.SlugField(
-        max_length=50,
-        editable=False
-    )
     descricao = models.CharField(
         max_length=50,
         verbose_name=u'Descrição'
     )
+    slug = models.SlugField(max_length=50, unique=True)
 
     def __str__(self):
         """
@@ -28,9 +26,20 @@ class Estabelecimento(models.Model):
     """
     Representação de um estabelecimento.
     """
-    nome = models.CharField(max_length=100)
-    descricao = models.TextField(verbose_name=u'Descrição')
-    localizacao = models.TextField(verbose_name=u'Localização')
+    nome = models.CharField(
+        max_length=100
+    )
+    descricao = models.TextField(
+        verbose_name=u'Descrição'
+    )
+    address = map_fields.AddressField(
+        max_length=200,
+        verbose_name=u'Localização'
+    )
+    geolocation = map_fields.GeoLocationField(
+        max_length=100,
+        verbose_name=u'Geolocalização'
+    )
     tipo_estabelecimento = models.ManyToManyField(
         to=TipoEstabelecimento,
         verbose_name=u'Tipo de estabelecimento'
@@ -52,7 +61,9 @@ class Telefone(models.Model):
     """
     Representação dos telefones de um restaurante.
     """
-    telefone = models.CharField(max_length=10)
+    telefone = models.CharField(
+        max_length=10
+    )
     estabelecimento = models.ForeignKey(
         to=Estabelecimento,
         on_delete=models.CASCADE,
@@ -105,8 +116,12 @@ class Imagem(models.Model):
     """
     Representação de imagens do estabelecimento.
     """
-    imagem = models.ImageField(verbose_name=u'Imagem')
-    descricao = models.TextField(verbose_name=u'Descrição')
+    imagem = models.ImageField(
+        verbose_name=u'Imagem'
+    )
+    descricao = models.TextField(
+        verbose_name=u'Descrição'
+    )
     estabelecimento = models.ForeignKey(
         to=Estabelecimento,
         on_delete=models.CASCADE,
@@ -119,6 +134,31 @@ class Imagem(models.Model):
         """
         return self.descricao
 
+
+class RedeSocial(models.Model):
+    """
+    Representação de links para redes sociais.
+    """
+
+    rede_social = models.CharField(
+        max_length=10,
+        choices=[
+            ('facebook', 'Facebook'),
+            ('instagram', 'Instragram'),
+        ]
+    )
+    link = models.TextField()
+    estabelecimento = models.ForeignKey(
+        to=Estabelecimento,
+        on_delete=models.CASCADE,
+        editable=False
+    )
+
+    def __str__(self):
+        """
+        Representação de um objeto.
+        """
+        return u'%s: %s' (self.rede_social, self.link)
 
 # class Aviso(models.Model):
 #     """
