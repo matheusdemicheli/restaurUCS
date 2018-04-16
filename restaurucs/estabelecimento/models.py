@@ -38,7 +38,7 @@ class Estabelecimento(models.Model):
     )
     geolocation = map_fields.GeoLocationField(
         max_length=100,
-        verbose_name=u'Geolocalização'
+        verbose_name=u'Geolocalização',
     )
     tipo_estabelecimento = models.ManyToManyField(
         to=TipoEstabelecimento,
@@ -135,19 +135,21 @@ class Imagem(models.Model):
         return self.descricao
 
 
-class RedeSocial(models.Model):
+class Midia(models.Model):
     """
-    Representação de links para redes sociais.
+    Representação de links para midias do estabelecimento.
     """
-
-    rede_social = models.CharField(
+    midia = models.CharField(
         max_length=10,
         choices=[
             ('facebook', 'Facebook'),
             ('instagram', 'Instragram'),
+            ('site', 'Site'),
+            ('blog', 'Blog')
         ]
     )
-    link = models.TextField()
+    url = models.URLField()
+
     estabelecimento = models.ForeignKey(
         to=Estabelecimento,
         on_delete=models.CASCADE,
@@ -158,7 +160,7 @@ class RedeSocial(models.Model):
         """
         Representação de um objeto.
         """
-        return u'%s: %s' (self.rede_social, self.link)
+        return u'%s: %s' (self.midia, self.url)
 
 # class Aviso(models.Model):
 #     """

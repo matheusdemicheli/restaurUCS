@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_google_maps',
+    'phonenumber_field',
     'estabelecimento'
 ]
 
@@ -120,5 +121,17 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static"),
+]
+
+# Templates
+
+DIR = [
+    os.path.join(BASE_DIR, "templates"),
+]
+
+# Terceiros
 
 GOOGLE_MAPS_API_KEY = 'AIzaSyC6se6TITTysFgg4bgCwB8rlWj8jnR1F98'

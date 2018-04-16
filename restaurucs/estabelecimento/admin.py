@@ -2,7 +2,6 @@
 from django_google_maps import fields as map_fields
 from django_google_maps import widgets as map_widgets
 
-from django import forms
 from django.contrib import admin
 from django.db import models as django_models
 from django.forms.widgets import CheckboxSelectMultiple
@@ -31,11 +30,11 @@ class ImagemInline(admin.TabularInline):
     model = models.Imagem
 
 
-class RedeSocialInline(admin.TabularInline):
+class MidiaInline(admin.StackedInline):
     """
     Inline para o model RedeSocial.
     """
-    model = models.RedeSocial
+    model = models.Midia
 
 
 class EstabelecimentoModelAdmin(admin.ModelAdmin):
@@ -46,12 +45,29 @@ class EstabelecimentoModelAdmin(admin.ModelAdmin):
         TelefoneInline,
         HorarioAtendimentoInline,
         ImagemInline,
-        RedeSocialInline
+        MidiaInline
     ]
+
     formfield_overrides = {
         django_models.ManyToManyField: {'widget': CheckboxSelectMultiple},
         map_fields.AddressField: {'widget': map_widgets.GoogleMapsAddressWidget}
     }
+
+    class Media:
+        """
+        Adição de javascript.
+        """
+        js = (
+            # 'jquery-3.3.1.min.js',
+            'jquery.mask.min.js',
+            'estabelecimento/admin.js',
+        )
+
+    def get_changeform_initial_data(self, request):
+        """
+        Sobrescrito para retornar valores iniciais do form.
+        """
+        return {'geolocation': '-29.161442600144074,-51.15251292684479'}
 
 
 class TipoEstabelecimentoModelAdmin(admin.ModelAdmin):
