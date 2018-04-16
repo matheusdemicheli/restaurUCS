@@ -38,7 +38,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_google_maps',
-    'phonenumber_field',
     'estabelecimento'
 ]
 

@@ -13,7 +13,17 @@ class TipoEstabelecimento(models.Model):
         max_length=50,
         verbose_name=u'Descrição'
     )
-    slug = models.SlugField(max_length=50, unique=True)
+    slug = models.SlugField(
+        max_length=50,
+        unique=True
+    )
+
+    class Meta:
+        """
+        Meta class.
+        """
+        verbose_name = u'Tipo de Estabelecimento'
+        verbose_name_plural = u'Tipos de Estabelecimento'
 
     def __str__(self):
         """
@@ -39,6 +49,10 @@ class Estabelecimento(models.Model):
     geolocation = map_fields.GeoLocationField(
         max_length=100,
         verbose_name=u'Geolocalização',
+        help_text=(
+            u'Mova o marcador no mapa para indicar a localização do '
+            u'estabelecimento.'
+        )
     )
     tipo_estabelecimento = models.ManyToManyField(
         to=TipoEstabelecimento,
@@ -69,6 +83,13 @@ class Telefone(models.Model):
         on_delete=models.CASCADE,
         editable=False
     )
+
+    class Meta:
+        """
+        Definições do model.
+        """
+        verbose_name = u'Telefone'
+        verbose_name_plural = u'Telefones'
 
     def __str__(self):
         """
@@ -101,6 +122,13 @@ class HorarioAtendimento(models.Model):
         on_delete=models.CASCADE
     )
 
+    class Meta:
+        """
+        Definições do model.
+        """
+        verbose_name = u'Horário de Atendimento'
+        verbose_name_plural = u'Horários de Atendimento'
+
     def __str__(self):
         """
         Retorna a string de representação do objeto.
@@ -127,6 +155,13 @@ class Imagem(models.Model):
         on_delete=models.CASCADE,
         editable=False
     )
+
+    class Meta:
+        """
+        Definições do model.
+        """
+        verbose_name = u'Imagem'
+        verbose_name_plural = u'Imagens'
 
     def __str__(self):
         """
@@ -156,6 +191,13 @@ class Midia(models.Model):
         editable=False
     )
 
+    class Meta:
+        """
+        Definições do model.
+        """
+        verbose_name = 'Horário de Atendimento'
+        verbose_name_plural = 'Horários de Atendimento'
+
     def __str__(self):
         """
         Representação de um objeto.
@@ -168,7 +210,6 @@ class Midia(models.Model):
 #     """
 #     aviso = models.TextField()
 #     estabelecimento = models.ForeignKey(Estabelecimento, editable=False)
-
 
 # class Categoria(models.Model):
 #     """

@@ -13,6 +13,7 @@ class TelefoneInline(admin.TabularInline):
     """
     Inline para o model Telefone.
     """
+    extra = 2
     model = models.Telefone
 
 
@@ -20,6 +21,7 @@ class HorarioAtendimentoInline(admin.TabularInline):
     """
     Inline para o model HorarioAtendimento.
     """
+    extra = 7
     model = models.HorarioAtendimento
 
 
@@ -34,6 +36,7 @@ class MidiaInline(admin.StackedInline):
     """
     Inline para o model RedeSocial.
     """
+    extra = 2
     model = models.Midia
 
 
@@ -58,7 +61,7 @@ class EstabelecimentoModelAdmin(admin.ModelAdmin):
         Adição de javascript.
         """
         js = (
-            # 'jquery-3.3.1.min.js',
+            'jquery-3.3.1.min.js',
             'jquery.mask.min.js',
             'estabelecimento/admin.js',
         )
@@ -67,7 +70,10 @@ class EstabelecimentoModelAdmin(admin.ModelAdmin):
         """
         Sobrescrito para retornar valores iniciais do form.
         """
-        return {'geolocation': '-29.161442600144074,-51.15251292684479'}
+        return {
+            'address': 'Universidade de Caxias do Sul',
+            'geolocation': '-29.161442600144074,-51.15251292684479'
+        }
 
 
 class TipoEstabelecimentoModelAdmin(admin.ModelAdmin):
