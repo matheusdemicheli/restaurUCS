@@ -32,12 +32,21 @@ class ImagemInline(admin.TabularInline):
     model = models.Imagem
 
 
-class MidiaInline(admin.StackedInline):
+class MidiaInline(admin.TabularInline):
     """
     Inline para o model RedeSocial.
     """
     extra = 2
     model = models.Midia
+
+
+class OpcaoEstabelecimentoModelAdminInline(admin.TabularInline):
+    """
+    """
+    model = models.OpcaoEstabelecimento
+    formfield_overrides = {
+        django_models.ManyToManyField: {'widget': CheckboxSelectMultiple},
+    }
 
 
 class EstabelecimentoModelAdmin(admin.ModelAdmin):
@@ -48,7 +57,8 @@ class EstabelecimentoModelAdmin(admin.ModelAdmin):
         TelefoneInline,
         HorarioAtendimentoInline,
         ImagemInline,
-        MidiaInline
+        MidiaInline,
+        OpcaoEstabelecimentoModelAdminInline
     ]
 
     formfield_overrides = {
@@ -83,5 +93,23 @@ class TipoEstabelecimentoModelAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("descricao",)}
 
 
+class RestricaoAlimentarModelAdmin(admin.ModelAdmin):
+    """
+    ModelAdmin para o model RestricaoAlimentar.
+    """
+    prepopulated_fields = {"slug": ("descricao",)}
+
+
+class OpcaoEstabelecimentoModelAdmin(admin.ModelAdmin):
+    """
+    ModelAdmin para o model OpcaoEstabelecimento.
+    """
+    formfield_overrides = {
+        django_models.ManyToManyField: {'widget': CheckboxSelectMultiple},
+    }
+
+
 admin.site.register(models.Estabelecimento, EstabelecimentoModelAdmin)
 admin.site.register(models.TipoEstabelecimento, TipoEstabelecimentoModelAdmin)
+admin.site.register(models.RestricaoAlimentar, RestricaoAlimentarModelAdmin)
+admin.site.register(models.OpcaoEstabelecimento, OpcaoEstabelecimentoModelAdmin)
