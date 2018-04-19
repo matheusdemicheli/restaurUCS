@@ -7,14 +7,15 @@ from estabelecimento import utils
 
 class TipoEstabelecimento(models.Model):
     """
-    Representação de categorias.
+    Representação dos tipos de estabelecimento.
+    Ex: Restaurante, Lanchonete, Hamburgueria, Bar.
     """
     descricao = models.CharField(max_length=50, verbose_name='Descrição')
     slug = models.SlugField(max_length=50, unique=True)
 
     class Meta:
         """
-        Meta class.
+        Definições do Model.
         """
         verbose_name = 'Tipo de Estabelecimento'
         verbose_name_plural = 'Tipos de Estabelecimento'
@@ -40,6 +41,10 @@ class Estabelecimento(models.Model):
     email = models.EmailField(
         verbose_name='Email'
     )
+    tipo_estabelecimento = models.ManyToManyField(
+        to=TipoEstabelecimento,
+        verbose_name='Tipo de estabelecimento'
+    )
     address = map_fields.AddressField(
         max_length=200,
         verbose_name='Localização'
@@ -51,10 +56,6 @@ class Estabelecimento(models.Model):
             'Mova o marcador no mapa para indicar a localização do '
             'estabelecimento.'
         )
-    )
-    tipo_estabelecimento = models.ManyToManyField(
-        to=TipoEstabelecimento,
-        verbose_name='Tipo de estabelecimento'
     )
     usuario = models.OneToOneField(
         to=settings.AUTH_USER_MODEL,
@@ -210,27 +211,6 @@ class RestricaoAlimentar(models.Model):
     descricao = models.CharField(max_length=50, verbose_name='Descrição')
     slug = models.SlugField(max_length=50, unique=True)
 
-    class Meta:
-        """
-        Definições do model.
-        """
-        verbose_name = 'Restrição Alimentar'
-        verbose_name_plural = 'Restrições Alimentares'
-
-    def __str__(self):
-        """
-        Representação de um objeto.
-        """
-        return self.descricao
-
-
-class OpcaoEstabelecimento(models.Model):
-    """
-    Representação de Opções de um Estabelecimento.
-    """
-    opcao = models.CharField(max_length=100)
-    restricoes = models.ManyToManyField(RestricaoAlimentar)
-
     # contem_carne = models.BooleanField(
     #     default=False,
     #     verbose_name='Contém Carne?'
@@ -251,6 +231,34 @@ class OpcaoEstabelecimento(models.Model):
     #     default=False,
     #     verbose_name='Contém Mel?'
     # )
+
+    class Meta:
+        """
+        Definições do model.
+        """
+        verbose_name = 'Restrição Alimentar'
+        verbose_name_plural = 'Restrições Alimentares'
+
+    def __str__(self):
+        """
+        Representação de um objeto.
+        """
+        return self.descricao
+
+
+class OpcaoEstabelecimento(models.Model):
+    """
+    Representação de Opções de um Estabelecimento.
+    """
+    opcao = models.CharField(max_length=100)
+    preco = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        verbose_name='Preço'
+    )
+    restricoes = models.ManyToManyField(RestricaoAlimentar)
     estabelecimento = models.ForeignKey(
         to=Estabelecimento,
         editable=False,
