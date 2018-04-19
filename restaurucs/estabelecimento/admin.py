@@ -5,8 +5,16 @@ from django_google_maps import widgets as map_widgets
 from django.contrib import admin
 from django.db import models as django_models
 from django.forms.widgets import CheckboxSelectMultiple
+from django.http import HttpResponse
 
 from estabelecimento import models
+
+
+class AdminSuperUser(admin.AdminSite):
+    pass
+
+
+adminsite = AdminSuperUser(name='admin_superuser')
 
 
 class TelefoneInline(admin.TabularInline):
@@ -109,7 +117,7 @@ class OpcaoEstabelecimentoModelAdmin(admin.ModelAdmin):
     }
 
 
-admin.site.register(models.Estabelecimento, EstabelecimentoModelAdmin)
-admin.site.register(models.TipoEstabelecimento, TipoEstabelecimentoModelAdmin)
-admin.site.register(models.RestricaoAlimentar, RestricaoAlimentarModelAdmin)
-admin.site.register(models.OpcaoEstabelecimento, OpcaoEstabelecimentoModelAdmin)
+adminsite.register(models.Estabelecimento, EstabelecimentoModelAdmin)
+adminsite.register(models.TipoEstabelecimento, TipoEstabelecimentoModelAdmin)
+adminsite.register(models.RestricaoAlimentar, RestricaoAlimentarModelAdmin)
+adminsite.register(models.OpcaoEstabelecimento, OpcaoEstabelecimentoModelAdmin)

@@ -74,7 +74,7 @@ class Telefone(models.Model):
     Representação dos telefones de um restaurante.
     """
     telefone = models.CharField(
-        max_length=10
+        max_length=11
     )
     estabelecimento = models.ForeignKey(
         to=Estabelecimento,
@@ -193,8 +193,8 @@ class Midia(models.Model):
         """
         Definições do model.
         """
-        verbose_name = 'Horário de Atendimento'
-        verbose_name_plural = 'Horários de Atendimento'
+        verbose_name = 'Mídia'
+        verbose_name_plural = 'Mídias'
 
     def __str__(self):
         """
