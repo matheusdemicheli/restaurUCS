@@ -1,20 +1,28 @@
-{% extends "admin/index.html" %}
+{% extends "admin/change_form.html" %}
 
 {% block content_title %}{% endblock %}
+{% block sidebar %}{% endblock sidebar %}
+
 {% block content %}
-
-<table>
-    <tr class="model-estabelecimento">
-        <td><a href="{% url 'useradmin:estabelecimento_estabelecimento_add' %}" class="changelink">Editar informações gerais do estabelecimento</a></td>
-    </tr>
-    <tr>
-        <td><a href="#" class="changelink">Editar opções do estabelecimento</a></td>
-    </tr>
-</table>
-
-{% include 'useradmin/aba_estabelecimento.html' %}
-
+    <table>
+        <tr class="model-estabelecimento">
+            <td><a href="#" class="changelink">
+                Informações gerais do estabelecimento
+            </a></td>
+            <td><a href="#" class="changelink">
+                Cardápio padrão
+            </a></td>
+            <td><a href="#" class="changelink">
+                Cardápio do dia
+            </a></td>
+        </tr>
+    </table>
+    <form enctype="multipart/form-data" action="." method="post" id="form" novalidate>
+        {% csrf_token %}
+        <div id="content-main">
+            {% for html_form in html_forms %}
+                {{ html_form }}
+            {% endfor %}
+        </div>
+    </form>
 {% endblock content %}
-
-{% block sidebar %}
-{% endblock sidebar %}

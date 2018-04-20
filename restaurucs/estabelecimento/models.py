@@ -246,11 +246,11 @@ class RestricaoAlimentar(models.Model):
         return self.descricao
 
 
-class OpcaoEstabelecimento(models.Model):
+class CardapioPadrao(models.Model):
     """
-    Representação de Opções de um Estabelecimento.
+    Representação do cardápio padrão de um Estabelecimento.
     """
-    opcao = models.CharField(max_length=100)
+    item = models.CharField(max_length=100)
     preco = models.DecimalField(
         max_digits=5,
         decimal_places=2,
@@ -259,6 +259,19 @@ class OpcaoEstabelecimento(models.Model):
         verbose_name='Preço'
     )
     restricoes = models.ManyToManyField(RestricaoAlimentar)
+    categoria = models.CharField(
+        max_length=20,
+        choices=[
+            ('bebidas', 'Bebidas'),
+            ('doces', 'Doces'),
+            ('pratos_frios', 'Pratos Frios'),
+            ('pratos_quentes', 'Pratos Quentes'),
+            ('saladas', 'Saladas'),
+            ('salgados', 'Salgados'),
+            ('sobremesas', 'Sobremesas'),
+            ('sopas', 'Sopas'),
+        ]
+    )
     estabelecimento = models.ForeignKey(
         to=Estabelecimento,
         editable=False,
@@ -269,8 +282,15 @@ class OpcaoEstabelecimento(models.Model):
         """
         Definições do model.
         """
-        verbose_name = ''
-        verbose_name_plural = 'Horários de Atendimento'
+        verbose_name = 'Opção Alimentar'
+        verbose_name_plural = 'Opções Alimentares'
+
+
+class CardapioDia(CardapioPadrao):
+    """
+    Representação do Cardápio do dia de um estabelecimento.
+    """
+    dia = models.DateField()
 
 
 # class Aviso(models.Model):
@@ -279,16 +299,3 @@ class OpcaoEstabelecimento(models.Model):
 #     """
 #     aviso = models.TextField()
 #     estabelecimento = models.ForeignKey(Estabelecimento, editable=False)
-
-# class Categoria(models.Model):
-#     """
-#     """
-#
-#
-#
-#
-# class CardapioPadrao(models.Model):
-#     """
-#     """
-#     restaurante = models.OneToOneField(Restaurante)
-#     opcoes = models.

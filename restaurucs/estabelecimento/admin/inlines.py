@@ -38,15 +38,3 @@ class MidiaInline(admin.TabularInline):
     """
     extra = 2
     model = models.Midia
-
-
-class OpcaoEstabelecimentoInline(admin.TabularInline):
-    """
-    Inline para o model OpcaoEstabelecimento.
-    """
-    extra = 3
-    model = models.OpcaoEstabelecimento
-
-    formfield_overrides = {
-        django_models.ManyToManyField: {'widget': CheckboxSelectMultiple},
-    }
