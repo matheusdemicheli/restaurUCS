@@ -1,5 +1,7 @@
 #-*- coding: UTF-8 -*-
+import datetime
 from django_google_maps import fields as map_fields
+
 from django.conf import settings
 from django.db import models
 from estabelecimento import utils
@@ -211,27 +213,6 @@ class RestricaoAlimentar(models.Model):
     descricao = models.CharField(max_length=50, verbose_name='Descrição')
     slug = models.SlugField(max_length=50, unique=True)
 
-    # contem_carne = models.BooleanField(
-    #     default=False,
-    #     verbose_name='Contém Carne?'
-    # )
-    # contem_leite = models.BooleanField(
-    #     default=False,
-    #     verbose_name='Contém Leite?'
-    # )
-    # contem_ovos = models.BooleanField(
-    #     default=False,
-    #     verbose_name='Contém Ovos?'
-    # )
-    # contem_gluten = models.BooleanField(
-    #     default=False,
-    #     verbose_name='Contém Leite?'
-    # )
-    # contem_mel = models.BooleanField(
-    #     default=False,
-    #     verbose_name='Contém Mel?'
-    # )
-
     class Meta:
         """
         Definições do model.
@@ -246,19 +227,16 @@ class RestricaoAlimentar(models.Model):
         return self.descricao
 
 
-class CardapioPadrao(models.Model):
+class ItemCardapioPadrao(models.Model):
     """
-    Representação do cardápio padrão de um Estabelecimento.
+    Representação de um item do cardápio padrão de um Estabelecimento.
     """
     item = models.CharField(max_length=100)
-    preco = models.DecimalField(
-        max_digits=5,
-        decimal_places=2,
+    restricoes = models.ManyToManyField(
+        to=RestricaoAlimentar,
         null=True,
-        blank=True,
-        verbose_name='Preço'
+        blank=True
     )
-    restricoes = models.ManyToManyField(RestricaoAlimentar)
     categoria = models.CharField(
         max_length=20,
         choices=[
@@ -272,6 +250,13 @@ class CardapioPadrao(models.Model):
             ('sopas', 'Sopas'),
         ]
     )
+    preco = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        verbose_name='Preço'
+    )
     estabelecimento = models.ForeignKey(
         to=Estabelecimento,
         editable=False,
@@ -282,15 +267,28 @@ class CardapioPadrao(models.Model):
         """
         Definições do model.
         """
-        verbose_name = 'Opção Alimentar'
-        verbose_name_plural = 'Opções Alimentares'
+        verbose_name = 'Item do Cardápio Padrão'
+        verbose_name_plural = 'Itens do Cardápio Padrão'
 
 
-class CardapioDia(CardapioPadrao):
+class ItemCardapioDia(ItemCardapioPadrao):
     """
-    Representação do Cardápio do dia de um estabelecimento.
+    Representação de um item do Cardápio do dia de um estabelecimento.
     """
-    dia = models.DateField()
+    dia = models.DateField(auto_now_add=True)
+
+    class Meta:
+        """
+        Definições do model.
+        """
+        verbose_name = (
+            'Item do Cardápio do Dia %s'
+            % datetime.date.today().strftime('%d/%m/%Y')
+        )
+        verbose_name_plural = (
+            'Itens do Cardápio do Dia %s'
+            % datetime.date.today().strftime('%d/%m/%Y')
+        )
 
 
 # class Aviso(models.Model):

@@ -1,0 +1,74 @@
+[
+{
+    "model": "estabelecimento.tipoestabelecimento",
+    "pk": 1,
+    "fields": {
+        "descricao": "Restaurante",
+        "slug": "restaurante"
+    }
+},
+{
+    "model": "estabelecimento.tipoestabelecimento",
+    "pk": 2,
+    "fields": {
+        "descricao": "Bar",
+        "slug": "bar"
+    }
+},
+{
+    "model": "estabelecimento.tipoestabelecimento",
+    "pk": 3,
+    "fields": {
+        "descricao": "Lanchonete",
+        "slug": "lanchonete"
+    }
+},
+{
+    "model": "estabelecimento.tipoestabelecimento",
+    "pk": 4,
+    "fields": {
+        "descricao": "Hamburgueria",
+        "slug": "hamburgueria"
+    }
+},
+{
+    "model": "estabelecimento.restricaoalimentar",
+    "pk": 1,
+    "fields": {
+        "descricao": "Cont\u00e9m Carne",
+        "slug": "contem-carne"
+    }
+},
+{
+    "model": "estabelecimento.restricaoalimentar",
+    "pk": 2,
+    "fields": {
+        "descricao": "Cont\u00e9m Ovo",
+        "slug": "contem-ovo"
+    }
+},
+{
+    "model": "estabelecimento.restricaoalimentar",
+    "pk": 3,
+    "fields": {
+        "descricao": "Cont\u00e9m Leite",
+        "slug": "contem-leite"
+    }
+},
+{
+    "model": "estabelecimento.restricaoalimentar",
+    "pk": 4,
+    "fields": {
+        "descricao": "Cont\u00e9m Gl\u00faten",
+        "slug": "contem-gluten"
+    }
+},
+{
+    "model": "estabelecimento.restricaoalimentar",
+    "pk": 5,
+    "fields": {
+        "descricao": "Cont\u00e9m Mel",
+        "slug": "contem-mel"
+    }
+}
+]
