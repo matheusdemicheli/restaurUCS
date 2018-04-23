@@ -2,10 +2,14 @@
 {% load i18n static %}
 
 {% if usuario_comum %}
-
     {% block content_title %}{% endblock %}
     {% block sidebar %}{% endblock %}
     {% block breadcrumbs %}{% endblock %}
+
+    {% block extrastyle %}
+        {{ block.super }}
+        <link rel="stylesheet" type="text/css" href="{% static "css/estabelecimento/admin/change_form.css" %}" />
+    {% endblock %}
 
     {% block submit_buttons_bottom %}
         <input value="Salvar" class="default" name="_save" type="submit">
@@ -32,34 +36,48 @@
     {% endblock %}
 
     {% block content %}
-        <table>
-            <tr class="abas">
-                <td><a href="#" data-aba=".conteudo-aba-estabelecimento_form" class="changelink">
-                    Informações gerais do estabelecimento
-                </a></td>
-                <td><a href="#" data-aba=".conteudo-aba-itemcardapiopadrao_set" class="changelink">
-                    Cardápio padrão
-                </a></td>
-                <td><a href="#" data-aba=".conteudo-aba-itemcardapiodia_set" class="changelink">
-                    Cardápio do dia
-                </a></td>
-            </tr>
-        </table>
+        {% if usuario_comum %}
+            <table id="table-abas">
+                <tr class="abas">
+                    <td class="aba-ativa"><a href="#" data-aba=".conteudo-aba-estabelecimento_form" class="changelink">
+                        Informações Gerais
+                    </a></td>
+                    <td><a href="#" data-aba=".conteudo-aba-itemcardapiopadrao_set" class="changelink">
+                        Cardápio Padrão
+                    </a></td>
+                    <td><a href="#" data-aba=".conteudo-aba-itemcardapiodia_set" class="changelink">
+                        Cardápio do Dia
+                    </a></td>
+                    <td><a href="#" data-aba=".conteudo-aba-aviso_set" class="changelink">
+                        Avisos
+                    </a></td>
+                </tr>
+            </table>
 
-        {{ block.super }}
+            {{ block.super }}
 
-        <script>
-            $(document).ready(function(){
-                $('.abas a').on('click', function(){
-                    // Esconde demais conteúdos de outras abas.
-                    $('[class^="conteudo-aba"]').hide();
+            <script>
+                $(document).ready(function(){
+                    $('.abas a').on('click', function(){
+                        // Esconde demais conteúdos de outras abas.
+                        $('[class^="conteudo-aba"]').hide();
 
-                    // Exibe o conteúdo da aba clicada.
-                    var conteudo_aba = $(this).attr('data-aba');
-                    $(conteudo_aba).show();
+                        // Exibe o conteúdo da aba clicada.
+                        var conteudo_aba = $(this).attr('data-aba');
+                        $(conteudo_aba).show();
+                    });
+
+                    $('.abas td').on('click', function(){
+                        if (!$(this).hasClass('aba-ativa')){
+                            $('.aba-ativa').removeClass('aba-ativa');
+                            $(this).addClass('aba-ativa');
+                        }
+                    });
                 })
-            })
-        </script>
+            </script>
+        {% else %}
+            {{ block.super }}
+        {% endif %}
     {% endblock content %}
 
 {% endif %}

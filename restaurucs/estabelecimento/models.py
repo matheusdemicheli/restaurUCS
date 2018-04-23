@@ -59,6 +59,10 @@ class Estabelecimento(models.Model):
             'estabelecimento.'
         )
     )
+    ativo = models.BooleanField(
+        default=True,
+        editable=False
+    )
     usuario = models.OneToOneField(
         to=settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -82,7 +86,6 @@ class Telefone(models.Model):
     estabelecimento = models.ForeignKey(
         to=Estabelecimento,
         on_delete=models.CASCADE,
-        editable=False
     )
 
     class Meta:
@@ -119,7 +122,6 @@ class HorarioAtendimento(models.Model):
     )
     estabelecimento = models.ForeignKey(
         to=Estabelecimento,
-        editable=False,
         on_delete=models.CASCADE
     )
 
@@ -154,7 +156,6 @@ class Imagem(models.Model):
     estabelecimento = models.ForeignKey(
         to=Estabelecimento,
         on_delete=models.CASCADE,
-        editable=False
     )
 
     class Meta:
@@ -189,7 +190,6 @@ class Midia(models.Model):
     estabelecimento = models.ForeignKey(
         to=Estabelecimento,
         on_delete=models.CASCADE,
-        editable=False
     )
 
     class Meta:
@@ -227,14 +227,13 @@ class RestricaoAlimentar(models.Model):
         return self.descricao
 
 
-class ItemCardapioPadrao(models.Model):
+class ItemCardapio(models.Model):
     """
-    Representação de um item do cardápio padrão de um Estabelecimento.
+    Representação de um item do cardápio de um Estabelecimento.
     """
     item = models.CharField(max_length=100)
     restricoes = models.ManyToManyField(
         to=RestricaoAlimentar,
-        null=True,
         blank=True
     )
     categoria = models.CharField(
@@ -259,9 +258,20 @@ class ItemCardapioPadrao(models.Model):
     )
     estabelecimento = models.ForeignKey(
         to=Estabelecimento,
-        editable=False,
         on_delete=models.CASCADE,
     )
+
+    class Meta:
+        """
+        Definições do model.
+        """
+        abstract = True
+
+
+class ItemCardapioPadrao(ItemCardapio):
+    """
+    Representação de um item do cardápio padrão de um Estabelecimento.
+    """
 
     class Meta:
         """
@@ -271,7 +281,7 @@ class ItemCardapioPadrao(models.Model):
         verbose_name_plural = 'Itens do Cardápio Padrão'
 
 
-class ItemCardapioDia(ItemCardapioPadrao):
+class ItemCardapioDia(ItemCardapio):
     """
     Representação de um item do Cardápio do dia de um estabelecimento.
     """
@@ -281,19 +291,22 @@ class ItemCardapioDia(ItemCardapioPadrao):
         """
         Definições do model.
         """
-        verbose_name = (
-            'Item do Cardápio do Dia %s'
-            % datetime.date.today().strftime('%d/%m/%Y')
-        )
-        verbose_name_plural = (
-            'Itens do Cardápio do Dia %s'
-            % datetime.date.today().strftime('%d/%m/%Y')
-        )
+        verbose_name = 'Item do Cardápio do Dia'
+        verbose_name_plural = 'Itens do Cardápio do Dia'
 
 
-# class Aviso(models.Model):
-#     """
-#     Avisos sobre o estabelecimento.
-#     """
-#     aviso = models.TextField()
-#     estabelecimento = models.ForeignKey(Estabelecimento, editable=False)
+class Aviso(models.Model):
+    """
+    Avisos do estabelecimento.
+    """
+    aviso = models.TextField()
+    data_inicio_exibicao = models.DateTimeField(
+        verbose_name='Data de início para exibição'
+    )
+    data_fim_exibicao = models.DateTimeField(
+        verbose_name='Data de fim para exibição'
+    )
+    estabelecimento = models.ForeignKey(
+        Estabelecimento,
+        on_delete=models.CASCADE,
+    )

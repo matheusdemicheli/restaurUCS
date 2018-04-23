@@ -36,14 +36,21 @@ class UserSiteAdmin(admin.AdminSite):
         except models.Estabelecimento.DoesNotExist:
             template = admin_instance.add_view(request)
         else:
-            template = admin_instance.change_view(request, str(estabelecimento.pk))
+            template = admin_instance.change_view(
+                request,
+                str(estabelecimento.pk)
+            )
 
         if isinstance(template, HttpResponseRedirect):
             return HttpResponseRedirect('.')
 
         template.context_data.update({
             'usuario_comum': True,
-            'forms_abas': ('itemcardapiopadrao_set', 'itemcardapiodia_set')
+            'forms_abas': (
+                'itemcardapiopadrao_set',
+                'itemcardapiodia_set',
+                'aviso_set'
+            )
         })
         return template
 
@@ -99,12 +106,20 @@ class ItemCardapioDiaInline(admin.TabularInline):
     """
     Inline para o model CardapioDia.
     """
-    extra = 3
+    extra = 1
     model = models.ItemCardapioDia
 
     formfield_overrides = {
         django_models.ManyToManyField: {'widget': CheckboxSelectMultiple},
     }
+
+
+class AvisoInline(admin.TabularInline):
+    """
+    Inline para o model Aviso.
+    """
+    extra = 3
+    model = models.Aviso
 
 
 class TipoEstabelecimentoModelAdmin(admin.ModelAdmin):
@@ -131,7 +146,8 @@ class EstabelecimentoModelAdmin(admin.ModelAdmin):
         ImagemInline,
         MidiaInline,
         ItemCardapioPadraoInline,
-        ItemCardapioDiaInline
+        ItemCardapioDiaInline,
+        AvisoInline
     ]
 
     formfield_overrides = {
@@ -169,6 +185,7 @@ class EstabelecimentoModelAdmin(admin.ModelAdmin):
 
 admin.site.register(Group, GroupAdmin)
 admin.site.register(User, UserAdmin)
+
 admin.site.register(models.TipoEstabelecimento, TipoEstabelecimentoModelAdmin)
 admin.site.register(models.RestricaoAlimentar, RestricaoAlimentarModelAdmin)
 admin.site.register(models.Estabelecimento, EstabelecimentoModelAdmin)
@@ -178,3 +195,4 @@ admin.site.register(models.Imagem)
 admin.site.register(models.Midia)
 admin.site.register(models.ItemCardapioPadrao)
 admin.site.register(models.ItemCardapioDia)
+admin.site.register(models.Aviso)
