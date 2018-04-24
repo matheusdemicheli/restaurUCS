@@ -29,6 +29,49 @@ class TipoEstabelecimento(models.Model):
         return self.descricao
 
 
+class TipoServico(models.Model):
+    """
+    Representação dos tipos de serviço de um estabelecimento.
+    Ex: à la carte, buffet a quilo, buffet livre.
+    """
+    descricao = models.CharField(max_length=50, verbose_name='Descrição')
+    slug = models.SlugField(max_length=50, unique=True)
+
+    class Meta:
+        """
+        Definições do Model.
+        """
+        verbose_name = 'Tipo de Serviço'
+        verbose_name_plural = 'Tipos de Serviço'
+
+    def __str__(self):
+        """
+        Retorna a string de representação do objeto.
+        """
+        return self.descricao
+
+
+class RestricaoAlimentar(models.Model):
+    """
+    Representação de restrições alimentares.
+    """
+    descricao = models.CharField(max_length=50, verbose_name='Descrição')
+    slug = models.SlugField(max_length=50, unique=True)
+
+    class Meta:
+        """
+        Definições do model.
+        """
+        verbose_name = 'Restrição Alimentar'
+        verbose_name_plural = 'Restrições Alimentares'
+
+    def __str__(self):
+        """
+        Representação de um objeto.
+        """
+        return self.descricao
+
+
 class Estabelecimento(models.Model):
     """
     Representação de um estabelecimento.
@@ -46,6 +89,10 @@ class Estabelecimento(models.Model):
     tipo_estabelecimento = models.ManyToManyField(
         to=TipoEstabelecimento,
         verbose_name='Tipo de estabelecimento'
+    )
+    tipo_servico = models.ManyToManyField(
+        to=TipoServico,
+        verbose_name='Tipo de serviço'
     )
     address = map_fields.AddressField(
         max_length=200,
@@ -68,6 +115,16 @@ class Estabelecimento(models.Model):
         on_delete=models.CASCADE,
         editable=False
     )
+
+    @property
+    def cardapio_padrao(self):
+        """
+        Retorna o cardápio padrão do estabelecimento, se houver.
+        """
+        try:
+            return self.cardapio_set.get(data__isnull=True)
+        except Cardapio.DoesNotExist:
+            return None
 
     def __str__(self):
         """
@@ -119,6 +176,16 @@ class HorarioAtendimento(models.Model):
         max_length=5,
         verbose_name='Horário de encerramento',
         choices=utils.get_choices_horarios()
+    )
+    observacao = models.CharField(
+        null=True,
+        blank=True,
+        max_length=100,
+        verbose_name='Observação',
+        help_text=(
+            'Informe observações pertinentes ao horário de atendimento. '
+            'Ex: Neste horário funcionamos apenas como Lanchonete.'
+        )
     )
     estabelecimento = models.ForeignKey(
         to=Estabelecimento,
@@ -206,35 +273,121 @@ class Midia(models.Model):
         return '%s: %s' (self.midia, self.url)
 
 
-class RestricaoAlimentar(models.Model):
+class Aviso(models.Model):
     """
-    Representação de restrições alimentares.
+    Representação de avisos do estabelecimento.
     """
-    descricao = models.CharField(max_length=50, verbose_name='Descrição')
-    slug = models.SlugField(max_length=50, unique=True)
+    aviso = models.TextField()
+
+    data_inicio_exibicao = models.DateTimeField(
+        default=datetime.datetime.now,
+        verbose_name='Data de início para exibição'
+    )
+    data_fim_exibicao = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name=(
+            'Data de fim para exibição '
+            '(deixe em branco para sempre exibir o aviso)'
+        )
+    )
+    estabelecimento = models.ForeignKey(
+        Estabelecimento,
+        on_delete=models.CASCADE,
+    )
 
     class Meta:
         """
-        Definições do model.
+        Meta informações da classe.
         """
-        verbose_name = 'Restrição Alimentar'
-        verbose_name_plural = 'Restrições Alimentares'
+        verbose_name = 'Aviso'
+        verbose_name_plural = 'Avisos'
 
     def __str__(self):
         """
-        Representação de um objeto.
+        Representação do objeto.
         """
-        return self.descricao
+        return self.aviso
 
 
-class ItemCardapio(models.Model):
+class CardapioBase(models.Model):
+    """
+    Representação de um Cardápio.
+    """
+    preco_buffet_quilo = models.DecimalField(
+        max_digits=4,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        verbose_name='Preço buffet (quilo)'
+    )
+    preco_buffet_livre = models.DecimalField(
+        max_digits=4,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        verbose_name='Preço buffet (livre)'
+    )
+    estabelecimento = models.ForeignKey(
+        to=Estabelecimento,
+        on_delete=models.CASCADE
+    )
+
+    class Meta:
+        """
+        Meta informações da classe.
+        """
+        abstract = True
+
+
+class CardapioPadrao(CardapioBase):
+    """
+    Representação do cardápio padrão de um estabelecimento.
+    """
+
+    class Meta:
+        """
+        Meta informações da classe.
+        """
+        verbose_name = 'Cardápio Padrão'
+        verbose_name_plural = 'Cardápios Padrões'
+
+    def __str__(self):
+        """
+        Identificação do objeto.
+        """
+        return 'Cardápio padrão de %s' % self.estabelecimento
+
+
+class CardapioDia(CardapioBase):
+    """
+    Representação do cardápio de um dia específico de um estabelecimento.
+    """
+    data = models.DateField(
+        null=True,
+        blank=True,
+    )
+
+    class Meta:
+        """
+        Meta informações da classe.
+        """
+        verbose_name = 'Cardápio do Dia'
+        verbose_name_plural = 'Cardápios do Dia'
+
+    def __str__(self):
+        """
+        Identificação do objeto.
+        """
+        return '%s - Cardápio do dia %s' % (self.estabelecimento, self.data)
+
+
+class ItemCardapioBase(models.Model):
     """
     Representação de um item do cardápio de um Estabelecimento.
     """
-    item = models.CharField(max_length=100)
-    restricoes = models.ManyToManyField(
-        to=RestricaoAlimentar,
-        blank=True
+    item = models.CharField(
+        max_length=100
     )
     categoria = models.CharField(
         max_length=20,
@@ -249,64 +402,67 @@ class ItemCardapio(models.Model):
             ('sopas', 'Sopas'),
         ]
     )
+    restricoes = models.ManyToManyField(
+        to=RestricaoAlimentar,
+        blank=True,
+        verbose_name='Restrições'
+    )
     preco = models.DecimalField(
         max_digits=5,
         decimal_places=2,
         null=True,
         blank=True,
-        verbose_name='Preço'
-    )
-    estabelecimento = models.ForeignKey(
-        to=Estabelecimento,
-        on_delete=models.CASCADE,
+        verbose_name='Preço (à la carte)'
     )
 
     class Meta:
         """
-        Definições do model.
+        Meta informações da classe.
         """
         abstract = True
 
 
-class ItemCardapioPadrao(ItemCardapio):
+class ItemCardapioPadrao(ItemCardapioBase):
     """
     Representação de um item do cardápio padrão de um Estabelecimento.
     """
+    cardapio = models.ForeignKey(
+        to=CardapioPadrao,
+        on_delete=models.CASCADE
+    )
 
     class Meta:
         """
-        Definições do model.
+        Meta informações da classe.
         """
         verbose_name = 'Item do Cardápio Padrão'
         verbose_name_plural = 'Itens do Cardápio Padrão'
 
+    def __str__(self):
+        """
+        Identificação do objeto.
+        """
+        return self.item
 
-class ItemCardapioDia(ItemCardapio):
+
+class ItemCardapioDia(ItemCardapioBase):
     """
-    Representação de um item do Cardápio do dia de um estabelecimento.
+    Representação de um item do cardápio padrão de um Estabelecimento.
     """
-    dia = models.DateField(auto_now_add=True)
+    cardapio = models.ForeignKey(
+        to=CardapioDia,
+        on_delete=models.CASCADE
+    )
 
     class Meta:
         """
-        Definições do model.
+        Meta informações da classe.
         """
         verbose_name = 'Item do Cardápio do Dia'
         verbose_name_plural = 'Itens do Cardápio do Dia'
 
-
-class Aviso(models.Model):
-    """
-    Avisos do estabelecimento.
-    """
-    aviso = models.TextField()
-    data_inicio_exibicao = models.DateTimeField(
-        verbose_name='Data de início para exibição'
-    )
-    data_fim_exibicao = models.DateTimeField(
-        verbose_name='Data de fim para exibição'
-    )
-    estabelecimento = models.ForeignKey(
-        Estabelecimento,
-        on_delete=models.CASCADE,
-    )
+    def __str__(self):
+        """
+        Identificação do objeto.
+        """
+        return self.item

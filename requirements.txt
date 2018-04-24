@@ -1,3 +1,4 @@
 Django
 Pillow
 django-google-maps
+django-nested-admin

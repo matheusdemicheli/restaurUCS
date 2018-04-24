@@ -2,6 +2,7 @@
 """
 Admin.
 """
+import nested_admin
 from django_google_maps import fields as map_fields
 from django_google_maps import widgets as map_widgets
 
@@ -44,13 +45,15 @@ class UserSiteAdmin(admin.AdminSite):
         if isinstance(template, HttpResponseRedirect):
             return HttpResponseRedirect('.')
 
+        obj = template.context_data.get('original')
         template.context_data.update({
             'usuario_comum': True,
             'forms_abas': (
-                'itemcardapiopadrao_set',
-                'itemcardapiodia_set',
+                'cardapio_set',
+                'cardapio_set-2',
                 'aviso_set'
-            )
+            ),
+            'cardapio_padrao': obj and obj.cardapio_padrao
         })
         return template
 
@@ -58,7 +61,7 @@ class UserSiteAdmin(admin.AdminSite):
 admin.site = UserSiteAdmin()
 
 
-class TelefoneInline(admin.TabularInline):
+class TelefoneInline(nested_admin.NestedTabularInline):
     """
     Inline para o model Telefone.
     """
@@ -66,7 +69,7 @@ class TelefoneInline(admin.TabularInline):
     model = models.Telefone
 
 
-class HorarioAtendimentoInline(admin.TabularInline):
+class HorarioAtendimentoInline(nested_admin.NestedTabularInline):
     """
     Inline para o model HorarioAtendimento.
     """
@@ -74,7 +77,7 @@ class HorarioAtendimentoInline(admin.TabularInline):
     model = models.HorarioAtendimento
 
 
-class ImagemInline(admin.TabularInline):
+class ImagemInline(nested_admin.NestedTabularInline):
     """
     Inline para o model Imagem.
     """
@@ -82,7 +85,7 @@ class ImagemInline(admin.TabularInline):
     model = models.Imagem
 
 
-class MidiaInline(admin.TabularInline):
+class MidiaInline(nested_admin.NestedTabularInline):
     """
     Inline para o model RedeSocial.
     """
@@ -90,9 +93,17 @@ class MidiaInline(admin.TabularInline):
     model = models.Midia
 
 
-class ItemCardapioPadraoInline(admin.TabularInline):
+class AvisoInline(nested_admin.NestedTabularInline):
     """
-    Inline para o model ItemCardapioPadrao.
+    Inline para o model Aviso.
+    """
+    extra = 3
+    model = models.Aviso
+
+
+class ItemCardapioPadraoInline(nested_admin.NestedTabularInline):
+    """
+    Inline para o model ItemCardapio.
     """
     extra = 3
     model = models.ItemCardapioPadrao
@@ -102,11 +113,11 @@ class ItemCardapioPadraoInline(admin.TabularInline):
     }
 
 
-class ItemCardapioDiaInline(admin.TabularInline):
+class ItemCardapioDiaInline(nested_admin.NestedTabularInline):
     """
-    Inline para o model CardapioDia.
+    Inline para o model ItemCardapio.
     """
-    extra = 1
+    extra = 3
     model = models.ItemCardapioDia
 
     formfield_overrides = {
@@ -114,17 +125,36 @@ class ItemCardapioDiaInline(admin.TabularInline):
     }
 
 
-class AvisoInline(admin.TabularInline):
+class CarpioPadraoInline(nested_admin.NestedStackedInline):
     """
-    Inline para o model Aviso.
+    Inline para o model Cardapio.
     """
-    extra = 3
-    model = models.Aviso
+    extra = 1
+    max_num = 1
+    model = models.CardapioPadrao
+    inlines = [ItemCardapioPadraoInline]
+    exclude = ['data']
+
+
+class CardapioDiaInline(nested_admin.NestedStackedInline):
+    """
+    Inline para o model Cardapio.
+    """
+    extra = 1
+    model = models.CardapioDia
+    inlines = [ItemCardapioDiaInline]
 
 
 class TipoEstabelecimentoModelAdmin(admin.ModelAdmin):
     """
     ModelAdmin para o model TipoEstabelecimento.
+    """
+    prepopulated_fields = {"slug": ("descricao",)}
+
+
+class TipoServicoModelAdmin(admin.ModelAdmin):
+    """
+    ModelAdmin para o model TipoServico.
     """
     prepopulated_fields = {"slug": ("descricao",)}
 
@@ -136,7 +166,7 @@ class RestricaoAlimentarModelAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("descricao",)}
 
 
-class EstabelecimentoModelAdmin(admin.ModelAdmin):
+class EstabelecimentoModelAdmin(nested_admin.NestedModelAdmin):
     """
     ModelAdmin para o model Estabelecimento.
     """
@@ -145,9 +175,9 @@ class EstabelecimentoModelAdmin(admin.ModelAdmin):
         HorarioAtendimentoInline,
         ImagemInline,
         MidiaInline,
-        ItemCardapioPadraoInline,
-        ItemCardapioDiaInline,
-        AvisoInline
+        AvisoInline,
+        CarpioPadraoInline,
+        CardapioDiaInline
     ]
 
     formfield_overrides = {
@@ -186,6 +216,7 @@ class EstabelecimentoModelAdmin(admin.ModelAdmin):
 admin.site.register(Group, GroupAdmin)
 admin.site.register(User, UserAdmin)
 
+admin.site.register(models.TipoServico, TipoServicoModelAdmin)
 admin.site.register(models.TipoEstabelecimento, TipoEstabelecimentoModelAdmin)
 admin.site.register(models.RestricaoAlimentar, RestricaoAlimentarModelAdmin)
 admin.site.register(models.Estabelecimento, EstabelecimentoModelAdmin)
@@ -193,6 +224,5 @@ admin.site.register(models.Telefone)
 admin.site.register(models.HorarioAtendimento)
 admin.site.register(models.Imagem)
 admin.site.register(models.Midia)
-admin.site.register(models.ItemCardapioPadrao)
-admin.site.register(models.ItemCardapioDia)
+admin.site.register(models.Cardapio)
 admin.site.register(models.Aviso)

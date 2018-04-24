@@ -24,9 +24,16 @@
     {% block inline_field_sets %}
           {% for inline_admin_formset in inline_admin_formsets %}
               {% if inline_admin_formset.formset.prefix in forms_abas %}
-                  <div class="conteudo-aba-{{ inline_admin_formset.formset.prefix }}" style="display: none">
-                      {% include inline_admin_formset.opts.template %}
-                  </div>
+                  {% if inline_admin_formset.formset.prefix == 'cardapio_set-2' and not cardapio_padrao %}
+                      <p>Salve o cardápio padrão antes de preencher um cardápio de um dia específico.</p>
+                      <div style="display: none">
+                          {% include inline_admin_formset.opts.template %}
+                      </div>
+                  {% else %}
+                      <div class="conteudo-aba-{{ inline_admin_formset.formset.prefix }}" style="display: none">
+                          {% include inline_admin_formset.opts.template %}
+                      </div>
+                  {% endif %}
               {% else %}
                   <div class="conteudo-aba-estabelecimento_form">
                       {% include inline_admin_formset.opts.template %}
@@ -37,15 +44,16 @@
 
     {% block content %}
         {% if usuario_comum %}
+            {{ obj }}
             <table id="table-abas">
                 <tr class="abas">
                     <td class="aba-ativa"><a href="#" data-aba=".conteudo-aba-estabelecimento_form" class="changelink">
                         Informações Gerais
                     </a></td>
-                    <td><a href="#" data-aba=".conteudo-aba-itemcardapiopadrao_set" class="changelink">
+                    <td><a href="#" data-aba=".conteudo-aba-cardapio_set" class="changelink">
                         Cardápio Padrão
                     </a></td>
-                    <td><a href="#" data-aba=".conteudo-aba-itemcardapiodia_set" class="changelink">
+                    <td><a href="#" data-aba=".conteudo-aba-cardapio_set-2" class="changelink">
                         Cardápio do Dia
                     </a></td>
                     <td><a href="#" data-aba=".conteudo-aba-aviso_set" class="changelink">
@@ -53,26 +61,32 @@
                     </a></td>
                 </tr>
             </table>
-
             {{ block.super }}
-
             <script>
                 $(document).ready(function(){
-                    $('.abas a').on('click', function(){
+                    function ajustar_abas(aba){
                         // Esconde demais conteúdos de outras abas.
                         $('[class^="conteudo-aba"]').hide();
-
                         // Exibe o conteúdo da aba clicada.
-                        var conteudo_aba = $(this).attr('data-aba');
+                        var conteudo_aba = $(aba).attr('data-aba');
                         $(conteudo_aba).show();
+                    };
+                    function ajustar_aba_ativa(aba){
+                        if (!$(aba).hasClass('aba-ativa')){
+                            $('.aba-ativa').removeClass('aba-ativa');
+                            $(aba).addClass('aba-ativa');
+                        }
+                    };
+                    $('.abas a').on('click', function(){
+                        ajustar_abas(this)
+                    });
+                    $('.abas td').on('click', function(){
+                        ajustar_aba_ativa(this)
                     });
 
-                    $('.abas td').on('click', function(){
-                        if (!$(this).hasClass('aba-ativa')){
-                            $('.aba-ativa').removeClass('aba-ativa');
-                            $(this).addClass('aba-ativa');
-                        }
-                    });
+                    ajustar_abas($('.aba-ativa a'));
+                    $('#cardapio_set-group').find('h2').first().remove();
+                    $('#cardapio_set-2-group').find('h2').first().remove();
                 })
             </script>
         {% else %}
