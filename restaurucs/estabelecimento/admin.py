@@ -12,6 +12,7 @@ from django.contrib.auth.admin import GroupAdmin, UserAdmin
 from django.db import models as django_models
 from django.http import HttpResponseRedirect
 from django.forms.widgets import CheckboxSelectMultiple
+from django.utils.functional import curry
 
 from estabelecimento import models
 
@@ -49,8 +50,8 @@ class UserSiteAdmin(admin.AdminSite):
         template.context_data.update({
             'usuario_comum': True,
             'forms_abas': (
-                'cardapio_set',
-                'cardapio_set-2',
+                'cardapiopadrao',
+                'cardapiodia_set',
                 'aviso_set'
             ),
             'cardapio_padrao': obj and obj.cardapio_padrao
@@ -124,25 +125,75 @@ class ItemCardapioDiaInline(nested_admin.NestedTabularInline):
         django_models.ManyToManyField: {'widget': CheckboxSelectMultiple},
     }
 
+    def get_formset(self, request, obj=None, **kwargs):
+        """
+        Sobrescrito para retornar valores iniciais do form.
+        """
+        formset = super().get_formset(request, obj, **kwargs)
+
+        try:
+            cardapio_padrao = request.user.estabelecimento.cardapiopadrao
+        except (models.Estabelecimento.DoesNotExist,
+                models.CardapioPadrao.DoesNotExist):
+            pass
+        else:
+            initial = []
+            itens_cardapio = cardapio_padrao.itemcardapiopadrao_set.all()
+
+            for item_cardapio in itens_cardapio.prefetch_related('restricoes'):
+                initial.append({
+                    'item': item_cardapio.item,
+                    'categoria': item_cardapio.categoria,
+                    'restricoes': [
+                        restricao
+                        for restricao in item_cardapio.restricoes.all()
+                    ],
+                    'preco': item_cardapio.preco
+                })
+            formset.__init__ = curry(formset.__init__, initial=initial)
+        return formset
+
 
 class CarpioPadraoInline(nested_admin.NestedStackedInline):
     """
-    Inline para o model Cardapio.
+    Inline para o model CardapioPadrao.
     """
     extra = 1
     max_num = 1
     model = models.CardapioPadrao
     inlines = [ItemCardapioPadraoInline]
-    exclude = ['data']
 
 
 class CardapioDiaInline(nested_admin.NestedStackedInline):
     """
-    Inline para o model Cardapio.
+    Inline para o model CardapioDia.
     """
     extra = 1
     model = models.CardapioDia
     inlines = [ItemCardapioDiaInline]
+    fields = ('data', 'preco_buffet_quilo', 'preco_buffet_livre')
+
+    def get_formset(self, request, obj=None, **kwargs):
+        """
+        Sobrescrito para retornar valores iniciais do form.
+        """
+        formset = super().get_formset(request, obj, **kwargs)
+
+        try:
+            cardapio_padrao = request.user.estabelecimento.cardapiopadrao
+        except (models.Estabelecimento.DoesNotExist,
+                models.CardapioPadrao.DoesNotExist):
+            pass
+        else:
+            initial = models.CardapioPadrao.objects.filter(
+                pk=cardapio_padrao.pk
+            ).values(
+                'preco_buffet_quilo',
+                'preco_buffet_livre'
+            )
+            formset.__init__ = curry(formset.__init__, initial=initial)
+
+        return formset
 
 
 class TipoEstabelecimentoModelAdmin(admin.ModelAdmin):

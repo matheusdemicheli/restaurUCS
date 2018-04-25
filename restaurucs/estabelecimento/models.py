@@ -119,11 +119,11 @@ class Estabelecimento(models.Model):
     @property
     def cardapio_padrao(self):
         """
-        Retorna o cardápio padrão do estabelecimento, se houver.
+        Retorna o cardápio padrão do estabelecimento.
         """
         try:
-            return self.cardapio_set.get(data__isnull=True)
-        except Cardapio.DoesNotExist:
+            return self.cardapiopadrao
+        except CardapioPadrao.DoesNotExist:
             return None
 
     def __str__(self):
@@ -156,7 +156,9 @@ class Telefone(models.Model):
         """
         Retorna a string de representação do objeto.
         """
-        return self.telefone
+        return '(%s) %s-%s' % (
+            self.telefone[0:2], self.telefone[2:6], self.telefone[6:]
+        )
 
 
 class HorarioAtendimento(models.Model):
@@ -204,7 +206,7 @@ class HorarioAtendimento(models.Model):
         Retorna a string de representação do objeto.
         """
         return '%s: %s - %s' % (
-            self.dia_semana,
+            self.get_dia_semana_display(),
             self.horario_abertura,
             self.horario_encerramento
         )
@@ -328,10 +330,6 @@ class CardapioBase(models.Model):
         blank=True,
         verbose_name='Preço buffet (livre)'
     )
-    estabelecimento = models.ForeignKey(
-        to=Estabelecimento,
-        on_delete=models.CASCADE
-    )
 
     class Meta:
         """
@@ -344,13 +342,17 @@ class CardapioPadrao(CardapioBase):
     """
     Representação do cardápio padrão de um estabelecimento.
     """
+    estabelecimento = models.OneToOneField(
+        to=Estabelecimento,
+        on_delete=models.CASCADE
+    )
 
     class Meta:
         """
         Meta informações da classe.
         """
         verbose_name = 'Cardápio Padrão'
-        verbose_name_plural = 'Cardápios Padrões'
+        verbose_name_plural = 'Cardápio Padrão'
 
     def __str__(self):
         """
@@ -363,9 +365,11 @@ class CardapioDia(CardapioBase):
     """
     Representação do cardápio de um dia específico de um estabelecimento.
     """
-    data = models.DateField(
-        null=True,
-        blank=True,
+    data = models.DateField()
+
+    estabelecimento = models.ForeignKey(
+        to=Estabelecimento,
+        on_delete=models.CASCADE
     )
 
     class Meta:
@@ -379,7 +383,7 @@ class CardapioDia(CardapioBase):
         """
         Identificação do objeto.
         """
-        return '%s - Cardápio do dia %s' % (self.estabelecimento, self.data)
+        return 'Cardápio do dia %s de %s' % (self.data, self.estabelecimento)
 
 
 class ItemCardapioBase(models.Model):

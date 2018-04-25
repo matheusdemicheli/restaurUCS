@@ -32,6 +32,30 @@
     }
 },
 {
+    "model": "estabelecimento.tiposervico",
+    "pk": 1,
+    "fields": {
+        "descricao": "\u00c0 la carte",
+        "slug": "a-la-carte"
+    }
+},
+{
+    "model": "estabelecimento.tiposervico",
+    "pk": 2,
+    "fields": {
+        "descricao": "Buffet a quilo",
+        "slug": "buffet-quilo"
+    }
+},
+{
+    "model": "estabelecimento.tiposervico",
+    "pk": 3,
+    "fields": {
+        "descricao": "Buffet livre",
+        "slug": "buffet-livre"
+    }
+},
+{
     "model": "estabelecimento.restricaoalimentar",
     "pk": 1,
     "fields": {
