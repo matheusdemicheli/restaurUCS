@@ -130,7 +130,7 @@ class ItemCardapioDiaInline(nested_admin.NestedTabularInline):
         """
         if obj:
             try:
-                cardapio_padrao = obj.estabelecimento.cardapio_padrao
+                cardapio_padrao = obj.estabelecimento.cardapiopadrao
             except models.CardapioPadrao.DoesNotExist:
                 pass
             else:
