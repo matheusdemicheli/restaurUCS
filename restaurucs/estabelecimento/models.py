@@ -376,6 +376,7 @@ class CardapioDia(CardapioBase):
         """
         Meta informações da classe.
         """
+        ordering = ['data']
         verbose_name = 'Cardápio do Dia'
         verbose_name_plural = 'Cardápios do Dia'
 
@@ -439,6 +440,7 @@ class ItemCardapioPadrao(ItemCardapioBase):
         """
         Meta informações da classe.
         """
+        ordering = ['categoria', 'item']
         verbose_name = 'Item do Cardápio Padrão'
         verbose_name_plural = 'Itens do Cardápio Padrão'
 
@@ -462,6 +464,7 @@ class ItemCardapioDia(ItemCardapioBase):
         """
         Meta informações da classe.
         """
+        ordering = ['categoria', 'item']
         verbose_name = 'Item do Cardápio do Dia'
         verbose_name_plural = 'Itens do Cardápio do Dia'
 
@@ -470,3 +473,29 @@ class ItemCardapioDia(ItemCardapioBase):
         Identificação do objeto.
         """
         return self.item
+
+
+# class Promocao(models.Model):
+#     """
+#     Representação de promoções de um estabelecimento.
+#     """
+#     descricao = models.TextField(verbose_name='Descrição')
+#     data_inicio = models.DateTimeField(verbose_name='Data de início')
+#     data_fim = models.DateTimeField(verbose_name='Data de fim')
+#     estabelecimento = models.ForeignKey(
+#         to=Estabelecimento,
+#         on_delete=models.CASCADE
+#     )
+#
+#     class Meta:
+#         """
+#         Meta informações da classe.
+#         """
+#         verbose_name = 'Promoção'
+#         verbose_name_plural = 'Promoções'
+#
+#     def __str__(self):
+#         """
+#         Identificação do objeto.
+#         """
+#         return self.descricao

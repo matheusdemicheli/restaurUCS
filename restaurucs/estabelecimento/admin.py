@@ -118,18 +118,32 @@ class ItemCardapioDiaInline(nested_admin.NestedTabularInline):
     """
     Inline para o model ItemCardapio.
     """
-    extra = 3
     model = models.ItemCardapioDia
 
     formfield_overrides = {
         django_models.ManyToManyField: {'widget': CheckboxSelectMultiple},
     }
 
+    def get_extra(self, request, obj=None, **kwargs):
+        """
+        Sobrescrito para definir o extra dinâmicamente.
+        """
+        if obj:
+            try:
+                cardapio_padrao = obj.estabelecimento.cardapio_padrao
+            except models.CardapioPadrao.DoesNotExist:
+                pass
+            else:
+                return cardapio_padrao.itemcardapiopadrao_set.count()
+        return 1
+
     def get_formset(self, request, obj=None, **kwargs):
         """
         Sobrescrito para retornar valores iniciais do form.
         """
         formset = super().get_formset(request, obj, **kwargs)
+        if request.method == 'POST' or (obj and obj.pk):
+            return formset
 
         try:
             cardapio_padrao = request.user.estabelecimento.cardapiopadrao
