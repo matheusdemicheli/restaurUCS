@@ -499,3 +499,5 @@ class ItemCardapioDia(ItemCardapioBase):
 #         Identificação do objeto.
 #         """
 #         return self.descricao
+
+# class TokenPromocao(models.Model)

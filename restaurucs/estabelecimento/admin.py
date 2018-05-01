@@ -115,10 +115,11 @@ class ItemCardapioPadraoInline(nested_admin.NestedTabularInline):
 
 
 class ItemCardapioDiaInline(nested_admin.NestedTabularInline):
-    """
+    """1
     Inline para o model ItemCardapio.
     """
     model = models.ItemCardapioDia
+    classes = ['collapse']
 
     formfield_overrides = {
         django_models.ManyToManyField: {'widget': CheckboxSelectMultiple},
@@ -128,21 +129,21 @@ class ItemCardapioDiaInline(nested_admin.NestedTabularInline):
         """
         Sobrescrito para definir o extra dinâmicamente.
         """
-        if obj:
-            try:
-                cardapio_padrao = obj.estabelecimento.cardapiopadrao
-            except models.CardapioPadrao.DoesNotExist:
-                pass
-            else:
-                return cardapio_padrao.itemcardapiopadrao_set.count()
-        return 1
+        try:
+            cardapio_padrao = request.user.estabelecimento.cardapiopadrao
+        except (models.Estabelecimento.DoesNotExist,
+                models.CardapioPadrao.DoesNotExist):
+            return 1
+        return cardapio_padrao.itemcardapiopadrao_set.count()
+
 
     def get_formset(self, request, obj=None, **kwargs):
         """
         Sobrescrito para retornar valores iniciais do form.
         """
         formset = super().get_formset(request, obj, **kwargs)
-        if request.method == 'POST' or (obj and obj.pk):
+
+        if obj and obj.pk:
             return formset
 
         try:
@@ -152,17 +153,20 @@ class ItemCardapioDiaInline(nested_admin.NestedTabularInline):
             pass
         else:
             initial = []
-            itens_cardapio = cardapio_padrao.itemcardapiopadrao_set.all()
-
-            for item_cardapio in itens_cardapio.prefetch_related('restricoes'):
+            itens = cardapio_padrao.itemcardapiopadrao_set.all().order_by(
+                'categoria',
+                'item',
+                'pk'
+            )
+            for item_cardapio in itens.prefetch_related('restricoes'):
                 initial.append({
-                    'item': item_cardapio.item,
-                    'categoria': item_cardapio.categoria,
+                    'item': str(item_cardapio.item),
+                    'categoria': str(item_cardapio.categoria),
                     'restricoes': [
-                        restricao
+                        str(restricao.pk)
                         for restricao in item_cardapio.restricoes.all()
                     ],
-                    'preco': item_cardapio.preco
+                    'preco': str(item_cardapio.preco)
                 })
             formset.__init__ = curry(formset.__init__, initial=initial)
         return formset

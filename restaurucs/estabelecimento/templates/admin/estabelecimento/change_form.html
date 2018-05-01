@@ -1,91 +1,88 @@
 {% extends "admin/change_form.html" %}
 {% load i18n static %}
 
-{% if usuario_comum %}
-    {% block content_title %}{% endblock %}
-    {% block sidebar %}{% endblock %}
-    {% block breadcrumbs %}{% endblock %}
+{% block content_title %}{% endblock %}
+{% block sidebar %}{% endblock %}
+{% block breadcrumbs %}{% endblock %}
 
-    {% block extrastyle %}
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static "css/estabelecimento/admin/change_form.css" %}" />
+{% endblock %}
+
+{% block submit_buttons_bottom %}
+    <input value="Salvar" class="default" name="_save" type="submit">
+{% endblock %}
+
+{% block field_sets %}
+    <div class="conteudo-aba-estabelecimento_form">
         {{ block.super }}
-        <link rel="stylesheet" type="text/css" href="{% static "css/estabelecimento/admin/change_form.css" %}" />
-    {% endblock %}
+    </div>
+{% endblock %}
 
-    {% block submit_buttons_bottom %}
-        <input value="Salvar" class="default" name="_save" type="submit">
-    {% endblock %}
-
-    {% block field_sets %}
-        <div class="conteudo-aba-estabelecimento_form">
-            {{ block.super }}
-        </div>
-    {% endblock %}
-
-    {% block inline_field_sets %}
-          {% for inline_admin_formset in inline_admin_formsets %}
-              {% if inline_admin_formset.formset.prefix in forms_abas %}
-                  <div class="conteudo-aba-{{ inline_admin_formset.formset.prefix }}" style="display: none">
-                      {% if inline_admin_formset.formset.prefix == 'cardapiodia_set' and not cardapio_padrao %}
-                          <p>Salve o cardápio padrão antes de preencher um cardápio de um dia específico.</p>
-                          <div style="display: none">
-                              {% include inline_admin_formset.opts.template %}
-                          </div>
-                      {% else %}
+{% block inline_field_sets %}
+      {% for inline_admin_formset in inline_admin_formsets %}
+          {% if inline_admin_formset.formset.prefix in forms_abas %}
+              <div class="conteudo-aba-{{ inline_admin_formset.formset.prefix }}" style="display: none">
+                  {% if inline_admin_formset.formset.prefix == 'cardapiodia_set' and not cardapio_padrao %}
+                      <p>Salve o cardápio padrão antes de preencher um cardápio de um dia específico.</p>
+                      <div style="display: none">
                           {% include inline_admin_formset.opts.template %}
-                      {% endif %}
-                  </div>
-              {% else %}
-                  <div class="conteudo-aba-estabelecimento_form">
+                      </div>
+                  {% else %}
                       {% include inline_admin_formset.opts.template %}
-                  </div>
-              {% endif %}
-          {% endfor %}
-    {% endblock %}
+                  {% endif %}
+              </div>
+          {% else %}
+              <div class="conteudo-aba-estabelecimento_form">
+                  {% include inline_admin_formset.opts.template %}
+              </div>
+          {% endif %}
+      {% endfor %}
+{% endblock %}
 
-    {% block content %}
-        {% if usuario_comum %}
-            <table id="table-abas">
-                <tr class="abas">
-                    <td class="aba-ativa"><a href="#" data-aba=".conteudo-aba-estabelecimento_form" class="changelink">
-                        Informações Gerais
-                    </a></td>
-                    <td><a href="#" data-aba=".conteudo-aba-cardapiopadrao" class="changelink">
-                        Cardápio Padrão
-                    </a></td>
-                    <td><a href="#" data-aba=".conteudo-aba-cardapiodia_set" class="changelink">
-                        Cardápio do Dia
-                    </a></td>
-                    <td><a href="#" data-aba=".conteudo-aba-aviso_set" class="changelink">
-                        Avisos
-                    </a></td>
-                </tr>
-            </table>
-            {{ block.super }}
-            <script>
-                $(document).ready(function(){
-                    function ajustar_abas(aba){
-                        // Esconde demais conteúdos de outras abas.
-                        $('[class^="conteudo-aba"]').hide();
-                        // Muda o background da aba.
-                        var td = $(aba).parent('td');
-                        if (!$(td).hasClass('aba-ativa')){
-                            $('.aba-ativa').removeClass('aba-ativa');
-                            $(td).addClass('aba-ativa');
-                        }
-                        // Exibe o conteúdo da aba clicada.
-                        var conteudo_aba = $(aba).attr('data-aba');
-                        $(conteudo_aba).show();
-                    };
+{% block content %}
+    {% if usuario_comum %}
+        <table id="table-abas">
+            <tr class="abas">
+                <td class="aba-ativa"><a href="#" data-aba=".conteudo-aba-estabelecimento_form" class="changelink">
+                    Informações Gerais
+                </a></td>
+                <td><a href="#" data-aba=".conteudo-aba-cardapiopadrao" class="changelink">
+                    Cardápio Padrão
+                </a></td>
+                <td><a href="#" data-aba=".conteudo-aba-cardapiodia_set" class="changelink">
+                    Cardápio do Dia
+                </a></td>
+                <td><a href="#" data-aba=".conteudo-aba-aviso_set" class="changelink">
+                    Avisos
+                </a></td>
+            </tr>
+        </table>
+        {{ block.super }}
+        <script>
+            $(document).ready(function(){
+                function ajustar_abas(aba){
+                    // Esconde demais conteúdos de outras abas.
+                    $('[class^="conteudo-aba"]').hide();
+                    // Muda o background da aba.
+                    var td = $(aba).parent('td');
+                    if (!$(td).hasClass('aba-ativa')){
+                        $('.aba-ativa').removeClass('aba-ativa');
+                        $(td).addClass('aba-ativa');
+                    }
+                    // Exibe o conteúdo da aba clicada.
+                    var conteudo_aba = $(aba).attr('data-aba');
+                    $(conteudo_aba).show();
+                };
 
-                    ajustar_abas($('.aba-ativa a'));
-                    $('.abas a').on('click', function(){ajustar_abas(this)});
-                    $('#cardapiodia_set-group').find('h2').first().remove();
-                    $('#cardapiopadrao-group').find('h2').first().remove();
-                })
-            </script>
-        {% else %}
-            {{ block.super }}
-        {% endif %}
-    {% endblock content %}
-
-{% endif %}
+                ajustar_abas($('.aba-ativa a'));
+                $('.abas a').on('click', function(){ajustar_abas(this)});
+                // $('#cardapiodia_set-group').find('h2').first().remove();
+                // $('#cardapiopadrao-group').find('h2').first().remove();
+            })
+        </script>
+    {% else %}
+        {{ block.super }}
+    {% endif %}
+{% endblock content %}
