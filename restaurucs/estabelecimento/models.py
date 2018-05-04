@@ -144,6 +144,9 @@ class Telefone(models.Model):
         to=Estabelecimento,
         on_delete=models.CASCADE,
     )
+    whatsapp = models.BooleanField(
+        verbose_name='O número está disponível por WhatsApp?'
+    )
 
     class Meta:
         """
@@ -288,10 +291,7 @@ class Aviso(models.Model):
     data_fim_exibicao = models.DateTimeField(
         null=True,
         blank=True,
-        verbose_name=(
-            'Data de fim para exibição '
-            '(deixe em branco para sempre exibir o aviso)'
-        )
+        verbose_name='Data de fim para exibição '
     )
     estabelecimento = models.ForeignKey(
         Estabelecimento,
@@ -380,11 +380,26 @@ class CardapioDia(CardapioBase):
         verbose_name = 'Cardápio do Dia'
         verbose_name_plural = 'Cardápios do Dia'
 
+    def clean(self):
+        """
+        Não permite adicionar dois cardápios com a mesma data.
+        """
+        if self.pk and CardapioDia.objects.filter(data=data).count() > 1:
+            raise ValidationError({
+                'data': (
+                    'Já existe um cardápio para o dia %s'
+                    % self.data.strftime('%d/%m/%Y')
+                )
+            })
+
     def __str__(self):
         """
         Identificação do objeto.
         """
-        return 'Cardápio do dia %s de %s' % (self.data, self.estabelecimento)
+        return 'Cardápio do dia %s de %s' % (
+            self.data.strftime('%d/%m/%Y'),
+            self.estabelecimento
+        )
 
 
 class ItemCardapioBase(models.Model):
@@ -399,8 +414,8 @@ class ItemCardapioBase(models.Model):
         choices=[
             ('bebidas', 'Bebidas'),
             ('doces', 'Doces'),
-            ('pratos_frios', 'Pratos Frios'),
-            ('pratos_quentes', 'Pratos Quentes'),
+            ('pratos-frios', 'Pratos Frios'),
+            ('pratos-quentes', 'Pratos Quentes'),
             ('saladas', 'Saladas'),
             ('salgados', 'Salgados'),
             ('sobremesas', 'Sobremesas'),
@@ -475,29 +490,41 @@ class ItemCardapioDia(ItemCardapioBase):
         return self.item
 
 
-# class Promocao(models.Model):
-#     """
-#     Representação de promoções de um estabelecimento.
-#     """
-#     descricao = models.TextField(verbose_name='Descrição')
-#     data_inicio = models.DateTimeField(verbose_name='Data de início')
-#     data_fim = models.DateTimeField(verbose_name='Data de fim')
-#     estabelecimento = models.ForeignKey(
-#         to=Estabelecimento,
-#         on_delete=models.CASCADE
-#     )
-#
-#     class Meta:
-#         """
-#         Meta informações da classe.
-#         """
-#         verbose_name = 'Promoção'
-#         verbose_name_plural = 'Promoções'
-#
-#     def __str__(self):
-#         """
-#         Identificação do objeto.
-#         """
-#         return self.descricao
+class Promocao(models.Model):
+    """
+    Representação de promoções de um estabelecimento.
+    """
+    descricao = models.TextField(
+        verbose_name='Descrição'
+    )
+    data_inicio = models.DateTimeField(
+        verbose_name='Data de início'
+    )
+    data_fim = models.DateTimeField(
+        verbose_name='Data de fim'
+    )
+    estabelecimento = models.ForeignKey(
+        to=Estabelecimento,
+        on_delete=models.CASCADE
+    )
 
-# class TokenPromocao(models.Model)
+    class Meta:
+        """
+        Meta informações da classe.
+        """
+        verbose_name = 'Promoção'
+        verbose_name_plural = 'Promoções'
+
+    def __str__(self):
+        """
+        Identificação do objeto.
+        """
+        return self.descricao
+
+
+class TokenPromocao(models.Model):
+    """
+    Representação da ligação entre um Token para ser usado em uma Promoção.
+    """
+    token = models.CharField(max_length=8)
+    promocao = models.ForeignKey(to=Promocao, on_delete=models.CASCADE)

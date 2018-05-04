@@ -1,5 +1,6 @@
 #-*- coding:utf-8 -*-
 import datetime
+import secrets
 
 
 def get_choices_horarios():
@@ -30,3 +31,13 @@ def get_choices_dias_semana():
         (5, 'Sábado'),
         (6, 'Domingo')
     ]
+
+
+def criar_token():
+    """
+    Cria um token somente com números e letras.
+    """
+    token = secrets.token_urlsafe(6)
+    while ('-' in token or '_' in token):
+        token = secrets.token_urlsafe(6)
+    return token

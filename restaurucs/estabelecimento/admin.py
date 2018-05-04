@@ -25,7 +25,8 @@ class UserSiteAdmin(admin.AdminSite):
 
     def index(self, request, extra_context=None):
         """
-        Quando não for superuser, renderiza o template customizado.
+        Quando não for superuser, renderiza o changeform do model
+        Estabelecimento no lugar do index.
         """
         if request.user.is_superuser:
             return super().index(request, extra_context)
@@ -47,12 +48,14 @@ class UserSiteAdmin(admin.AdminSite):
             return HttpResponseRedirect('.')
 
         obj = template.context_data.get('original')
+
         template.context_data.update({
             'usuario_comum': True,
             'forms_abas': (
                 'cardapiopadrao',
                 'cardapiodia_set',
-                'aviso_set'
+                'aviso_set',
+                'promocao_set'
             ),
             'cardapio_padrao': obj and obj.cardapio_padrao
         })
@@ -102,6 +105,14 @@ class AvisoInline(nested_admin.NestedTabularInline):
     model = models.Aviso
 
 
+class PromocaoInline(nested_admin.NestedTabularInline):
+    """
+    Inline para o model Promocao.
+    """
+    extra = 3
+    model = models.Promocao
+
+
 class ItemCardapioPadraoInline(nested_admin.NestedTabularInline):
     """
     Inline para o model ItemCardapio.
@@ -128,6 +139,7 @@ class ItemCardapioDiaInline(nested_admin.NestedTabularInline):
     def get_extra(self, request, obj=None, **kwargs):
         """
         Sobrescrito para definir o extra dinâmicamente.
+        Popula o initial com os itens do cardápio padrão.
         """
         try:
             cardapio_padrao = request.user.estabelecimento.cardapiopadrao
@@ -194,6 +206,7 @@ class CardapioDiaInline(nested_admin.NestedStackedInline):
     def get_formset(self, request, obj=None, **kwargs):
         """
         Sobrescrito para retornar valores iniciais do form.
+        Popula o initial com as informações do cardápio padrão.
         """
         formset = super().get_formset(request, obj, **kwargs)
 
@@ -246,7 +259,8 @@ class EstabelecimentoModelAdmin(nested_admin.NestedModelAdmin):
         MidiaInline,
         AvisoInline,
         CarpioPadraoInline,
-        CardapioDiaInline
+        CardapioDiaInline,
+        PromocaoInline
     ]
 
     formfield_overrides = {
@@ -296,3 +310,4 @@ admin.site.register(models.Midia)
 admin.site.register(models.CardapioPadrao)
 admin.site.register(models.CardapioDia)
 admin.site.register(models.Aviso)
+admin.site.register(models.Promocao)
