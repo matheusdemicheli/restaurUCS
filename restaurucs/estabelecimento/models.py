@@ -7,6 +7,10 @@ from django.db import models
 from estabelecimento import utils
 
 
+# chat
+# login social
+# fidelização
+
 class TipoEstabelecimento(models.Model):
     """
     Representação dos tipos de estabelecimento.
@@ -490,6 +494,54 @@ class ItemCardapioDia(ItemCardapioBase):
         return self.item
 
 
+class ProgramaFidelizacaoEstabelecimento(models.Model):
+    """
+    Representação de programas de fidelização de um estabelecimento.
+    """
+    descricao = models.TextField(
+        verbose_name='Descrição'
+    )
+    quantidade_ocorrencias = models.PositiveSmallIntegerField(
+        verbose_name='Quantidade de ocorrências para completar a fidelização'
+    )
+    dias_expiracao = models.PositiveSmallIntegerField(
+        verbose_name='Quantidade de dias para expiração de cada ocorrência'
+    )
+    estabelecimento = models.ForeignKey(
+        to=Estabelecimento,
+        on_delete=models.CASCADE
+    )
+
+    class Meta:
+        """
+        Meta informações da classe.
+        """
+        verbose_name = 'Programa de Fidelização'
+        verbose_name_plural = 'Programas de Fidelização'
+
+    def __str__(self):
+        """
+        Representação de um objeto.
+        """
+        return self.descricao
+
+
+class ProgramaFidelizacaoCliente(models.Model):
+    """
+    Representação da associação entre um programa de fidelização e um cliente.
+    """
+    cliente = models.ForeignKey(to=settings.AUTH_USER_MODEL)
+    programa_fidelizacao = models.ForeignKey(to=ProgramaFidelizacao)
+
+
+class ProgramaFidelizacaoOcorrenciaCliente(models.Model):
+    """
+    Representação de uma ocorrência para um programa de fidelização.
+    """
+    data_ocorrencia = models.DateTimeField()
+    programa_fidelizacao = models.ForeignKey(to=ProgramaFidelizacaoCliente)
+
+
 class Promocao(models.Model):
     """
     Representação de promoções de um estabelecimento.
@@ -527,4 +579,30 @@ class TokenPromocao(models.Model):
     Representação da ligação entre um Token para ser usado em uma Promoção.
     """
     token = models.CharField(max_length=8)
-    promocao = models.ForeignKey(to=Promocao, on_delete=models.CASCADE)
+    promocao = models.ForeignKey(
+        to=Promocao,
+        on_delete=models.CASCADE
+    )
+    data_uso = models.DateTimeField()
+    data_criacao = models.DateTimeField(auto_now_add=True)
+    # user_criacao
+
+    class Meta:
+        """
+        Meta informações da classe.
+        """
+        verbose_name = 'Token'
+        verbose_name_plural = 'Tokens'
+
+    def __str__(self):
+        """
+        Representação de um objeto.
+        """
+        return '%s - %s' % (self.promocao, self.token)
+
+    @property
+    def valido(self):
+        """
+        Verifica se o token é válido.
+        """
+        return bool(self.data_uso is None)
