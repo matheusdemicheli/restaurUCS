@@ -494,54 +494,54 @@ class ItemCardapioDia(ItemCardapioBase):
         return self.item
 
 
-class ProgramaFidelizacaoEstabelecimento(models.Model):
-    """
-    Representação de programas de fidelização de um estabelecimento.
-    """
-    descricao = models.TextField(
-        verbose_name='Descrição'
-    )
-    quantidade_ocorrencias = models.PositiveSmallIntegerField(
-        verbose_name='Quantidade de ocorrências para completar a fidelização'
-    )
-    dias_expiracao = models.PositiveSmallIntegerField(
-        verbose_name='Quantidade de dias para expiração de cada ocorrência'
-    )
-    estabelecimento = models.ForeignKey(
-        to=Estabelecimento,
-        on_delete=models.CASCADE
-    )
-
-    class Meta:
-        """
-        Meta informações da classe.
-        """
-        verbose_name = 'Programa de Fidelização'
-        verbose_name_plural = 'Programas de Fidelização'
-
-    def __str__(self):
-        """
-        Representação de um objeto.
-        """
-        return self.descricao
-
-
-class ProgramaFidelizacaoCliente(models.Model):
-    """
-    Representação da associação entre um programa de fidelização e um cliente.
-    """
-    cliente = models.ForeignKey(to=settings.AUTH_USER_MODEL)
-    programa_fidelizacao = models.ForeignKey(to=ProgramaFidelizacao)
-
-
-class ProgramaFidelizacaoOcorrenciaCliente(models.Model):
-    """
-    Representação de uma ocorrência para um programa de fidelização.
-    """
-    data_ocorrencia = models.DateTimeField()
-    programa_fidelizacao = models.ForeignKey(to=ProgramaFidelizacaoCliente)
-
-
+# class ProgramaFidelizacaoEstabelecimento(models.Model):
+#     """
+#     Representação de programas de fidelização de um estabelecimento.
+#     """
+#     descricao = models.TextField(
+#         verbose_name='Descrição'
+#     )
+#     quantidade_ocorrencias = models.PositiveSmallIntegerField(
+#         verbose_name='Quantidade de ocorrências para completar a fidelização'
+#     )
+#     dias_expiracao = models.PositiveSmallIntegerField(
+#         verbose_name='Quantidade de dias para expiração de cada ocorrência'
+#     )
+#     estabelecimento = models.ForeignKey(
+#         to=Estabelecimento,
+#         on_delete=models.CASCADE
+#     )
+#
+#     class Meta:
+#         """
+#         Meta informações da classe.
+#         """
+#         verbose_name = 'Programa de Fidelização'
+#         verbose_name_plural = 'Programas de Fidelização'
+#
+#     def __str__(self):
+#         """
+#         Representação de um objeto.
+#         """
+#         return self.descricao
+#
+#
+# class ProgramaFidelizacaoCliente(models.Model):
+#     """
+#     Representação da associação entre um programa de fidelização e um cliente.
+#     """
+#     cliente = models.ForeignKey(to=settings.AUTH_USER_MODEL)
+#     programa_fidelizacao = models.ForeignKey(to=ProgramaFidelizacao)
+#
+#
+# class ProgramaFidelizacaoOcorrenciaCliente(models.Model):
+#     """
+#     Representação de uma ocorrência para um programa de fidelização.
+#     """
+#     data_ocorrencia = models.DateTimeField()
+#     programa_fidelizacao = models.ForeignKey(to=ProgramaFidelizacaoCliente)
+#
+#
 class Promocao(models.Model):
     """
     Representação de promoções de um estabelecimento.
