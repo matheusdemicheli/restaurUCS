@@ -37,8 +37,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # Apps terceiros
     'django_google_maps',
     'nested_admin',
+    # Apps do projeto
+    'api',
     'estabelecimento'
 ]
 

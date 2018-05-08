@@ -20,7 +20,7 @@ $(window).load(function(){
     }
 
     // Carrega os dados da página inicial da app.
-    $("#home").load('home.html', function(){
+    $("#home").load('http://localhost:8000/api/home/', function(){
         $(this).trigger("create");
     });
 
