@@ -154,6 +154,36 @@
                 "delete_telefone",
                 "estabelecimento",
                 "telefone"
+            ],
+            [
+                "add_precobuffet",
+                "estabelecimento",
+                "precobuffet"
+            ],
+            [
+                "change_precobuffet",
+                "estabelecimento",
+                "precobuffet"
+            ],
+            [
+                "delete_precobuffet",
+                "estabelecimento",
+                "precobuffet"
+            ],
+            [
+                "add_promocao",
+                "estabelecimento",
+                "promocao"
+            ],
+            [
+                "change_promocao",
+                "estabelecimento",
+                "promocao"
+            ],
+            [
+                "delete_promocao",
+                "estabelecimento",
+                "promocao"
             ]
         ]
     }

@@ -316,36 +316,69 @@ class Aviso(models.Model):
         return self.aviso
 
 
-class CardapioBase(models.Model):
+class PrecoBuffet(models.Model):
     """
-    Representação de um Cardápio.
+    Representação de preços de buffet para um estabelecimento.
     """
-    preco_buffet_quilo = models.DecimalField(
+    descricao = models.TextField(
+        verbose_name='Descrição',
+        help_text=(
+            'Específique a particularidade dos preços cadastrados, se houver. '
+            'Ex: '
+            '"De segunda a sexta", '
+            '"Sábados", '
+            '"Cardápio Especial para o dia das mães"'
+        )
+    )
+    preco_quilo = models.DecimalField(
         max_digits=4,
         decimal_places=2,
         null=True,
         blank=True,
         verbose_name='Preço buffet (quilo)'
     )
-    preco_buffet_livre = models.DecimalField(
+    preco_livre = models.DecimalField(
         max_digits=4,
         decimal_places=2,
         null=True,
         blank=True,
         verbose_name='Preço buffet (livre)'
     )
+    estabelecimento = models.ForeignKey(
+        to=Estabelecimento,
+        on_delete=models.CASCADE
+    )
 
     class Meta:
         """
         Meta informações da classe.
         """
-        abstract = True
+        verbose_name = 'Preço Buffet'
+        verbose_name_plural = 'Preços Buffet'
+
+    def __str__(self):
+        """
+        Representação do objeto.
+        """
+        return self.descricao
+
+    def clean(self):
+        """
+        Não permite incluir sem especificar ao menos um preço.
+        """
+        if not self.preco_quilo and not self.preco_livre:
+            raise ValidationError('Informe ao menos um preço para o buffet.')
 
 
-class CardapioPadrao(CardapioBase):
+class CardapioPadrao(models.Model):
     """
     Representação do cardápio padrão de um estabelecimento.
     """
+    descricao = models.TextField(
+        verbose_name='Descrição',
+        null=True,
+        blank=True
+    )
     estabelecimento = models.OneToOneField(
         to=Estabelecimento,
         on_delete=models.CASCADE
@@ -365,12 +398,16 @@ class CardapioPadrao(CardapioBase):
         return 'Cardápio padrão de %s' % self.estabelecimento
 
 
-class CardapioDia(CardapioBase):
+class CardapioDia(models.Model):
     """
     Representação do cardápio de um dia específico de um estabelecimento.
     """
-    data = models.DateField()
-
+    data = models.DateField(verbose_name='Data')
+    descricao = models.TextField(
+        verbose_name='Descrição',
+        null=True,
+        blank=True
+    )
     estabelecimento = models.ForeignKey(
         to=Estabelecimento,
         on_delete=models.CASCADE

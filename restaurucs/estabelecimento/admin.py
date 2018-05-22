@@ -55,7 +55,8 @@ class UserSiteAdmin(admin.AdminSite):
                 'cardapiopadrao',
                 'cardapiodia_set',
                 'aviso_set',
-                'promocao_set'
+                'promocao_set',
+                'precobuffet_set'
             ),
             'cardapio_padrao': obj and obj.cardapio_padrao
         })
@@ -201,7 +202,6 @@ class CardapioDiaInline(nested_admin.NestedStackedInline):
     extra = 1
     model = models.CardapioDia
     inlines = [ItemCardapioDiaInline]
-    fields = ('data', 'preco_buffet_quilo', 'preco_buffet_livre')
 
     def get_formset(self, request, obj=None, **kwargs):
         """
@@ -223,8 +223,15 @@ class CardapioDiaInline(nested_admin.NestedStackedInline):
                 'preco_buffet_livre'
             )
             formset.__init__ = curry(formset.__init__, initial=initial)
-
         return formset
+
+
+class PrecoBuffetInline(nested_admin.NestedTabularInline):
+    """
+    Inline para o model PrecoBuffet.
+    """
+    extra = 1
+    model = models.PrecoBuffet
 
 
 class TipoEstabelecimentoModelAdmin(admin.ModelAdmin):
@@ -253,6 +260,8 @@ class EstabelecimentoModelAdmin(nested_admin.NestedModelAdmin):
     ModelAdmin para o model Estabelecimento.
     """
     inlines = [
+        PromocaoInline,
+        PrecoBuffetInline,
         TelefoneInline,
         HorarioAtendimentoInline,
         ImagemInline,
@@ -260,7 +269,6 @@ class EstabelecimentoModelAdmin(nested_admin.NestedModelAdmin):
         AvisoInline,
         CarpioPadraoInline,
         CardapioDiaInline,
-        PromocaoInline
     ]
 
     formfield_overrides = {
@@ -311,3 +319,4 @@ admin.site.register(models.CardapioPadrao)
 admin.site.register(models.CardapioDia)
 admin.site.register(models.Aviso)
 admin.site.register(models.Promocao)
+admin.site.register(models.PrecoBuffet)
