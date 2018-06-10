@@ -2,3 +2,4 @@ Django
 Pillow
 django-google-maps
 django-nested-admin
+django-cors-headers

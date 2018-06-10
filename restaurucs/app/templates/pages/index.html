@@ -1,0 +1,7 @@
+{% extends 'pages/base_page.html' %}
+
+{% block page_content %}
+	{% for estabelecimento in estabelecimentos %}
+		<a href="{{ request.scheme }}://{{ request.get_host }}{% url 'home_estabelecimento' estabelecimento.pk %}">{{ estabelecimento }}</a>
+	{% endfor %}
+{% endblock page_content %}

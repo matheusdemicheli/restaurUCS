@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block conteudo %}
+
+  <div data-role="header" data-position="fixed">
+    {% block page_header %}
+      <h1>{{ titulo_pagina }}</h1>
+    {% endblock page_header %}
+  </div>
+
+  <div role="main" class="ui-content" data-inset="false">
+	  {% block page_content %}{% endblock %}
+  </div>
+
+  <div data-role="footer" data-position="fixed">
+      {% block footer_content %}
+      {% endblock footer_content %}
+  </div>
+
+{% endblock %}

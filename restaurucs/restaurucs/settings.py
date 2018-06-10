@@ -40,14 +40,16 @@ INSTALLED_APPS = [
     # Apps terceiros
     'django_google_maps',
     'nested_admin',
+    'corsheaders',
     # Apps do projeto
-    'api',
+    'app',
     'estabelecimento'
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -137,4 +139,5 @@ DIR = [
 
 # Terceiros
 
+CORS_ORIGIN_ALLOW_ALL = True
 GOOGLE_MAPS_API_KEY = 'AIzaSyC6se6TITTysFgg4bgCwB8rlWj8jnR1F98'

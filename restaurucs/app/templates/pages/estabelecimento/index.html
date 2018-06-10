@@ -1,0 +1,17 @@
+{% extends 'pages/base_page.html' %}
+
+{% block page_content %}
+  <p>{{ estabelecimento }}</p>
+{% endblock page_content %}
+
+{% block footer_content %}
+  <div data-role="toolbar" data-type="footer" style="overflow:hidden;">
+    <div data-role="navbar">
+        <ul>
+            <li><a href="#">Sobre</a></li>
+            <li><a href="#">Cardápio</a></li>
+            <li><a href="#">Promoções</a></li>
+        </ul>
+    </div><!-- /navbar -->
+  </div><!-- /footer -->
+{% endblock %}
